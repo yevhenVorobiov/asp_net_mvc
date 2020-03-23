@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Hotel.Models.RoomType>
+
+@{
+    ViewBag.Title = "Room Types";
+}
+
+@{
+    if (User.IsInRole("Admin"))
+    {
+        <p>
+            @Html.ActionLink("Create New", "Create")
+        </p>
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LivingRoomsCount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BasicRate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LivingRoomsCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BasicRate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <div class="card-deck">
+            @foreach (var item in Model)
+            {
+                <div class="card mb-4" style="min-width: 18rem; max-width: 18rem;">
+                    <img class="card-img-top" src="@(item.ImageUrl)">
+                    <div class="card-body">
+                        <h4 class="card-title">@Html.DisplayFor(modelItem => item.Title)</h4>
+                        <p class="card-text">@Html.DisplayFor(modelItem => item.Description)</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>@Html.DisplayNameFor(model => model.LivingRoomsCount): </strong>@Html.DisplayFor(modelItem => item.LivingRoomsCount)</li>
+                    </ul>
+                </div>
+            }
+        </div>
+    }
+}

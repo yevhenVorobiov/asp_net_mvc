@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Hotel.Models.Booking>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EndDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.State)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VisitorsCount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FinalPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Comment)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.StartDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EndDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.State)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.VisitorsCount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FinalPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Comment)
+        </td>
+        <td>
+            @{
+                if (item.State != Hotel.Models.BookingState.CLOSED && item.State != Hotel.Models.BookingState.DECLINED)
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                }
+            }|
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+        </td>
+    </tr>
+}
+
+</table>

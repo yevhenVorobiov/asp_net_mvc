@@ -1,0 +1,224 @@
+﻿@model IEnumerable<Hotel.Models.Room>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+@{
+    if (User.IsInRole("Admin"))
+    {
+        <p>
+            @Html.ActionLink("Create New", "Create")
+        </p>
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Floor)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MaxVisitorsCount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ImageUrl)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Floor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaxVisitorsCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ImageUrl)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+    else
+    {
+        <form class="form-inline" @Url.Action("Index", "Rooms") method="get">
+            <label class="col-sm-2" for="StartDate">Start date:</label>
+            <input class="form-control mb-2 mr-sm-2" type="date" id="StartDate" name="StartDate" />
+            <label for="EndDate">End date:</label>
+            <input class="form-control mb-2 mr-sm-2" type="date" id="EndDate" name="EndDate" />
+            <button type="submit" class="btn btn-primary mb-2">Search</button>
+        </form>
+        <div class="text-center text-danger">
+            @Html.ValidationSummary(true)
+        </div>
+        <div class="card-deck">
+            @foreach (var item in Model)
+            {
+                <div class="card mb-4" style="min-width: 20rem; max-width: 23rem;" id="@(item.Id)">
+                    <img class="card-img-top" src="@(item.ImageUrl)">
+                    <div class="card-body">
+                        <h4 class="card-title">@Html.DisplayFor(modelItem => item.Title)</h4>
+                        <p class="card-text">@Html.DisplayFor(modelItem => item.Type.Description)</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>@Html.DisplayNameFor(model => model.Type): </strong>@Html.DisplayFor(modelItem => item.Type.Title)</li>
+                        <li class="list-group-item"><strong>@Html.DisplayNameFor(model => model.MaxVisitorsCount): </strong>@Html.DisplayFor(modelItem => item.MaxVisitorsCount)</li>
+                        <li class="list-group-item"><strong>@Html.DisplayNameFor(model => model.Floor): </strong>@Html.DisplayFor(modelItem => item.Floor)</li>
+                    </ul>
+                    @{
+                        if (item.Features != null && item.Features.Count > 0)
+                        {
+                            <div class="card-header">
+                                Features
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @foreach (var feature in item.Features)
+                                {
+                                    <li class="list-group-item"><p><strong>@(feature.Title)</strong> (@(feature.Description))</p></li>
+                                }
+                            </ul>
+                        }
+                    }
+                    <button class="btn btn-primary">Book</button>
+                </div>
+
+            }
+        </div>
+        <div id="modDialog" class="modal fade">
+            <div id="dialogContent" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Booking</h4>
+                        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="room-info">
+                            <div>
+                                <p id="room-title"></p>
+                            </div>
+                            <div>
+                                <p id="dates"></p>
+                            </div>
+                            <div>
+                                <p id="price"></p>
+                            </div>
+                        </div>
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label for="FirstName">First Name</label>
+                                <input required type="text" class="form-control" id="FirstName" placeholder="Enter first name" name="FirstName">
+                            </div>
+                            <div class="form-group">
+                                <label for="LastName">Last Name</label>
+                                <input required type="text" class="form-control" id="LastName" placeholder="Enter last name" name="LastName">
+                            </div>
+                            <div class="form-group">
+                                <label for="PhoneNumber">Phone number</label>
+                                <input required type="tel" class="form-control" id="PhoneNumber" placeholder="Enter phone" name="PhoneNumber" pattern="[0-9]{10}">
+                            </div>
+                            <div class="form-group">
+                                <label for="Email">Email address</label>
+                                <input required type="email" class="form-control" id="Email" aria-describedby="emailHelp" placeholder="Enter email" name="Email">
+                            </div>
+                            <div class="form-group">
+                                <label for="VisitorsCount">Visitor count</label>
+                                <input required type="number" min="1" max="6" class="form-control" id="VisitorsCount" name="VisitorsCount">
+                            </div>
+                            <div class="form-group">
+                                <label for="Comment">Comment</label>
+                                <textarea class="form-control" id="Comment" name="Comment" rows="3"></textarea>
+                            </div>
+                            <input id="roomId" type="hidden" name="RoomId" />
+                            <input id="startDateParam" type="hidden" name="StartDate" />
+                            <input id="endDateParam" type="hidden" name="EndDate" />
+                            <button type="submit" class="btn btn-primary">Book</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="successModal" class="modal fade">
+            <div id="dialogContent" class="modal-dialog">
+                    <div class="modal-body">
+                        <div id="successAlert" class="alert alert-success">
+                        </div>
+                    </div>
+            </div>
+        </div>
+        @section Scripts {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    $('#StartDate').val(urlParams.get('StartDate'));
+                    $('#EndDate').val(urlParams.get('EndDate'));
+                });
+                $('.card > button').click(function () {
+                    var roomCard = $(this).closest('.card')
+                    var id = roomCard.attr('id');
+                    var title = $(roomCard.find('.card-title')).text();
+                    var startDate = $('#StartDate').val();
+                    var endDate = $('#EndDate').val();
+                    if (startDate != undefined && endDate != undefined) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Rooms/CalculateCost',
+                            data: {
+                                id: id,
+                                startDate: startDate,
+                                endDate: endDate
+                            },
+                        }).done(function (price) {
+                            var roomTitle = 'Room: <strong>{0}</strong>'.format(title);
+                            var priceText = 'Final price: <strong>{0}$</strong>'.format(price);
+                            var dateText = 'Booking from <strong>{0}</strong> to <strong>{1}</strong>'.format(startDate, endDate);
+                            $('#room-title').html(roomTitle);
+                            $('#price').html(priceText);
+                            $('#dates').html(dateText);
+                            $('#roomId').val(id);
+                            $('#startDateParam').val(startDate);
+                            $('#endDateParam').val(endDate);
+                            $('#modDialog').find('.alert').remove();
+                            $('#modDialog').modal('show');
+                        });
+                    }
+                });
+
+                $('#bookingForm').on('submit', function (event) {
+                    event.preventDefault();
+                    var formData = getFormData($(this));
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Bookings/Create',
+                        data: formData,
+                        dataType: 'json'
+                    }).done(function (response) {
+                        $('#modDialog').modal('hide');
+                        $('#successAlert').text(response.message);
+                        $('#successModal').modal('show');
+                    }).fail(function (response) {
+                        var alert = $('<div></div>').addClass('alert alert-danger')
+                            .text(response.responseText);
+                        alert.click(function () {
+                            $(this).remove();
+                        });
+                        $('.room-info').after(alert);
+                    });
+                })
+            </script>
+        }
+    }
+}
